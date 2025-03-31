@@ -18,7 +18,7 @@ possible values of THEME
     gruvbox  dark     gruvbox light
     contrast dark     contrast light
 ]]
-THEME = "blue dark"     -- choose one of the above
+THEME = "green dark"     -- choose one of the above
 
 --[[
 waiting time before starting conky
@@ -62,7 +62,7 @@ There is no need to refresh it every second like the other values
 WARNING: this feature exploits third party services,
 therefore we cannot garantee your privacy if you turn it on
 ]]
-use_public_ip = false
+use_public_ip = true
 public_ip_refresh_rate = 60     -- secondes
 
 ----------------------------------------------

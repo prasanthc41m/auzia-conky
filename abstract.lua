@@ -353,8 +353,8 @@ local _download_total    = "totaldown "               .. net_interface
 local _upload_speed      = "upspeed "                 .. net_interface
 local _upload_speed_kb   = "upspeedf "                .. net_interface
 local _upload_total      = "totalup "                 .. net_interface
-local _ssid              = "wireless_essid "          .. net_interface
-local _wifi_signal       = "wireless_link_qual_perc " .. net_interface
+local _ssid              = "exec nmcli | grep wlan0 | head -1 | cut -c 21-50 "          
+local _wifi_signal       = "wireless_bitrate " .. net_interface
 local _local_ip          = "addr "                    .. net_interface
 
 
