@@ -1,0 +1,7 @@
+[Desktop Entry]
+Name=Conky Round
+Comment=Conky round for Linux
+Exec=$HOME/.config/conky/autostart.sh 
+Type=Application
+Icon=gnome-conky
+Categories=System;Monitor;

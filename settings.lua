@@ -18,7 +18,7 @@ possible values of THEME
     gruvbox  dark     gruvbox light
     contrast dark     contrast light
 ]]
-THEME = "green dark"     -- choose one of the above
+THEME = "crimson dark"     -- choose one of the above
 
 --[[
 waiting time before starting conky
