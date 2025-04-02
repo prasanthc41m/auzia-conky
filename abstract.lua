@@ -354,7 +354,7 @@ local _upload_speed      = "upspeed "                 .. net_interface
 local _upload_speed_kb   = "upspeedf "                .. net_interface
 local _upload_total      = "totalup "                 .. net_interface
 local _ssid              = "exec nmcli | grep wlan0 | head -1 | cut -c 21-50 "          
-local _wifi_signal       = "wireless_bitrate " .. net_interface
+local _wifi_signal       = "execi 10 wget -q -O - http://ipinfo.io/org | cut -c 9-29 "
 local _local_ip          = "addr "                    .. net_interface
 
 

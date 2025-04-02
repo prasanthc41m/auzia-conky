@@ -124,14 +124,14 @@ function draw_net()
     write(S.net.total.up.x, S.net.total.up.y, "▲"..upload_total(), 12, colors.text)
 
     local inf = {}
-   table.insert(inf, "SSID: " .. string.sub(ssid(), 0, 15))
---    table.insert(inf, "Wifi Signal:    " .. wifi_signal() .. "%")
+    table.insert(inf, "SSID:           " .. string.sub(ssid(), 0, 15))
     table.insert(inf, "Local IP:       " .. local_ip())
+    table.insert(inf, "ISP:           " .. wifi_signal())          
     if use_public_ip then
         if get_public_ip == nil or (updates()%public_ip_refresh_rate) == 0 then
             update_public_ip()
         end
-        table.insert(inf, "Public IP:      " .. get_public_ip())
+     table.insert(inf, "Public IP:      " .. get_public_ip())
     end
     write_line_by_line(S.net.list.x, S.net.list.y, 20, inf, colors.text, 12)
 end
