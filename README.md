@@ -43,8 +43,10 @@ git clone https://github.com/prasanthc41m/auzia-conky.git
 cd auzia-conky
 mkdir $HOME/.config/conky
 mv conky-start.desktop ~/.config/autostart/
-mv -rf * $HOME/.config/conky/
+mv * $HOME/.config/conky/
 sudo chmod +x $HOME/.config/conky/autostart.sh
+cd /tmp 
+rm -rf auzia-conky
 ```
 After ```reboot``` you can see the conky.
 ```
