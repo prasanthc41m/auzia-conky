@@ -3,5 +3,5 @@ Name=Conky Round
 Comment=Conky round for Linux
 Exec=$HOME/.config/conky/autostart.sh 
 Type=Application
-Icon=gnome-conky
+Icon=gnome-sticky-notes-applet
 Categories=System;Monitor;

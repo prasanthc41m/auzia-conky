@@ -35,10 +35,18 @@ More colors schemes are available. Choose a color from the `settings.lua` file a
 
 ## Download and Launch Auzia
 
-```sh
-git clone https://www.github.com/SZinedine/auzia-conky
+```
+sudo dnf install conky # Fedora
+sudo apt install conky # Debian
+cd /tmp
+git clone https://github.com/prasanthc41m/auzia-conky.git
 cd auzia-conky
-conky -c conkyrc
+mkdir $HOME/.config/conky
+mv conky-start.desktop ~/.config/autostart/
+mv -rf * $HOME/.config/conky/
+sudo chmod +x $HOME/.config/conky/autostart.sh
+```
+After ```reboot``` you can see the conky.
 ```
 
 Edit `settings.lua` to choose your network interface, Internet speed and other settings.
