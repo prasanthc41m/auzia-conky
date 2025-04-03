@@ -43,7 +43,7 @@ git clone https://github.com/prasanthc41m/auzia-conky.git
 cd auzia-conky
 sudo chmod +x install.sh
 ./install.sh
-rm -rf /tmp/auzia-conky
+cd && rm -rf /tmp/auzia-conky
 ```
 After ```reboot``` you can see the conky.
 ```

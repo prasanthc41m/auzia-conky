@@ -18,6 +18,6 @@ ln -s /usr/share/applications/conky-start.desktop  $HOME/.config/autostart/
 #
 mv * $HOME/.config/conky/
 sudo chmod +x $HOME/.config/conky/autostart.sh
-rm -rf /tmp/auzia-conky
+#
 gsettings set org.gnome.desktop.background picture-uri file:$HOME/.config/conky/spiderman.jpg
 gsettings set org.gnome.desktop.background picture-uri-dark file:$HOME/.config/conky/spiderman.jpg
