@@ -41,13 +41,9 @@ sudo apt install conky # Debian
 cd /tmp
 git clone https://github.com/prasanthc41m/auzia-conky.git
 cd auzia-conky
-mkdir $HOME/.config/conky
-sudo cp conky-start.desktop /usr/share/applications/
-mv conky-start.desktop ~/.config/autostart/
-mv * $HOME/.config/conky/
-sudo chmod +x $HOME/.config/conky/autostart.sh
-cd /tmp 
-rm -rf auzia-conky
+sudo chmod +x install.sh
+./install.sh
+rm -rf /tmp/auzia-conky
 ```
 After ```reboot``` you can see the conky.
 ```
