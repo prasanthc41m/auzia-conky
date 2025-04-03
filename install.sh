@@ -16,7 +16,7 @@ StartupNotify=true" > /tmp/conky-start.desktop
 sudo mv /tmp/conky-start.desktop /usr/share/applications/
 ln -s /usr/share/applications/conky-start.desktop  $HOME/.config/autostart/
 #
-mv -R * $HOME/.config/conky/
+mv * $HOME/.config/conky/
 sudo chmod +x $HOME/.config/conky/autostart.sh
 rm -rf /tmp/auzia-conky
 gsettings set org.gnome.desktop.background picture-uri file:$HOME/.config/conky/spiderman.jpg
