@@ -1,6 +1,5 @@
 #!/bin/sh
 #
-cd /tmp
 git clone https://github.com/prasanthc41m/auzia-conky.git
 cd auzia-conky
 mkdir $HOME/.config/conky

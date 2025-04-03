@@ -38,7 +38,7 @@ More colors schemes are available. Choose a color from the `settings.lua` file a
 ```
 sudo dnf install conky # Fedora
 sudo apt install conky # Debian
-cd /tmp
+cd /tmp/
 git clone https://github.com/prasanthc41m/auzia-conky.git
 cd auzia-conky
 sudo chmod +x install.sh
