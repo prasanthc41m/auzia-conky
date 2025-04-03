@@ -22,11 +22,12 @@ conky.config = {
 }
 
 conky.text = [[
+${font Mono:size=9}${alignc}${exec hostnamectl | grep Kernel ### | cut -c10-30}
 ${font Mono:size=9}${alignc}${exec hostnamectl | grep System ### | cut -c21-40}
-${alignc}${exec hostnamectl | grep Kernel ### | cut -c10-30}
-${alignc}Power Mode: ${execi 1 gdbus call --system --dest net.hadess.PowerProfiles --object-path /net/hadess/PowerProfiles --method org.freedesktop.DBus.Properties.Get "net.hadess.PowerProfiles" "ActiveProfile" | awk -F"'" '{print $2}' | tee /tmp/power_mode} 
-${font Mono:size=9}${alignc}Battery lasts for ${alignc}${battery_time BAT0}
 ${font Mono:size=9}${alignc} ${exec nvidia-smi --query-gpu=gpu_name --format=csv,noheader,nounits} GPU:${exec nvidia-smi | grep % | cut -c 61-63} %  Mem:${exec nvidia-smi | grep % | cut -c 37-40} MB  ${alignc} Pwr:${exec nvidia-smi | grep % | cut -c 21-23} W  Temp ${exec nvidia-smi | grep C |  tail -2 | head -1 | cut -c 8-10}°C
 ${font Mono:size=9}${alignc}${exec glxinfo | grep "Device:" | cut -c 13-32} free VRAM: ${exec glxinfo | grep 'dedicated'| cut -c48-60} of ${exec glxinfo | grep 'Dedicated'| cut -c29-60}  ${alignc} Temps: ${exec sensors|grep "edge"|cut -c16-22}
+${font Mono:size=9}${alignc}Battery lasts for ${alignc}${battery_time BAT0}
+${alignc}Power Mode: ${execi 1 gdbus call --system --dest net.hadess.PowerProfiles --object-path /net/hadess/PowerProfiles --method org.freedesktop.DBus.Properties.Get "net.hadess.PowerProfiles" "ActiveProfile" | awk -F"'" '{print $2}' | tee /tmp/power_mode} 
+${font Mono:size=9}${alignc}24hrs: ${time %H:%M:%S}
 ]]
 
