@@ -23,10 +23,10 @@ conky.config = {
 
 conky.text = [[
 ${font Mono:size=9}${alignc}Clock 24hrs: ${time %H:%M:%S}
-${font Mono:size=9}${alignc}${exec hostnamectl | grep Kernel ### | cut -c10-30}
-${font Mono:size=9}${alignc}${exec hostnamectl | grep System ### | cut -c21-40}
+${font Mono:size=9}${alignc}${exec hostnamectl | grep Kernel | cut -c10-30}
+${font Mono:size=9}${alignc}${exec hostnamectl | grep System | cut -c21-40}
 ${font Mono:size=9}${alignc} ${exec nvidia-smi --query-gpu=gpu_name --format=csv,noheader,nounits} GPU:${exec nvidia-smi | grep % | cut -c 61-63} %  Mem:${exec nvidia-smi | grep % | cut -c 37-40} MB  ${alignc} Pwr:${exec nvidia-smi | grep % | cut -c 21-23} W  Temp ${exec nvidia-smi | grep C |  tail -2 | head -1 | cut -c 8-10}°C
-${font Mono:size=9}${alignc}${exec glxinfo | grep "Device:" | cut -c 13-32} free VRAM: ${exec glxinfo | grep 'dedicated'| cut -c48-60} of ${exec glxinfo | grep 'Dedicated'| cut -c29-60}  ${alignc} Temps: ${exec sensors|grep "edge"|cut -c16-22}
+${font Mono:size=9}${alignc}${exec glxinfo | grep "Device:" | cut -c13-32} free VRAM: ${exec glxinfo | grep 'dedicated' | awk '{print $2}'} of ${exec glxinfo | grep 'Dedicated' | awk '{print $2}'}  ${alignc} Temps: ${exec sensors | grep "edge" | awk '{print $2}'}
 
 
 
