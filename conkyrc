@@ -64,3 +64,4 @@ ${font Mono:size=9}${alignc}Battery lasts for ${alignc}${battery_time BAT0}
 ${alignc}Power Mode: ${execi 1 gdbus call --system --dest net.hadess.PowerProfiles --object-path /net/hadess/PowerProfiles --method org.freedesktop.DBus.Properties.Get "net.hadess.PowerProfiles" "ActiveProfile" | awk -F"'" '{print $2}' | tee /tmp/power_mode} 
 ]]
 
+
