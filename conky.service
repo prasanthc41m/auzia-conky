@@ -1,0 +1,9 @@
+    [Unit]
+    Description=Conky Desktop Monitor
+    After=graphical-session.target
+
+    [Service]
+    Type=simple
+    ExecStart=$HOME/.config/autostart.sh
+    User=%I
+    Restart=on-failure
