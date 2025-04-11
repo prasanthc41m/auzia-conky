@@ -35,7 +35,7 @@ change_color_on_threshold = true
 CPU Cores (threads really)
 valid values are: 0, 2, 4, 6, 8, 10, 12
 ]]
-cpu_cores = 4
+cpu_cores = 6
 
 --[[
 EDIT THIS to match your network interface.
@@ -80,4 +80,6 @@ threshold_warning          = 60
 threshold_critical         = 80
 battery_threshold_warning  = 30
 battery_threshold_critical = 18
+
+------------------------------------------------
 

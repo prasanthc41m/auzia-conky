@@ -93,7 +93,7 @@ end
 
 function draw_disks()
     local rt = fs_used_perc("/")
-    local hm = fs_used_perc("/home")
+    local hm = fs_used_perc("/mnt/Data")
     local rt_text = string.format("Root: %s / %s (%s)", fs_used("/"), fs_size("/"), fs_free("/"))
     local hm_text = string.format("Data: %s / %s (%s)", fs_used("/mnt/Data"), fs_size("/mnt/Data"), fs_free("/mnt/Data"))
 
