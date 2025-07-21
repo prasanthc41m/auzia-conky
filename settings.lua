@@ -2,6 +2,7 @@ require("colors")
 
 --[[
 possible values of THEME
+    red dark          red light
     blue dark         blue light
     deepblue dark     deepblue light
     green dark        green light
@@ -17,8 +18,9 @@ possible values of THEME
     monochrome dark   monochrome light
     gruvbox  dark     gruvbox light
     contrast dark     contrast light
+
 ]]
-THEME = "crimson dark"     -- choose one of the above
+THEME = "red dark"     -- choose one of the above
 
 --[[
 waiting time before starting conky
