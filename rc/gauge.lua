@@ -21,8 +21,10 @@ local S = {
         begin          = -160,
         end_           = -200,
         text = {
-            perc  = { x = 1160, y = 608 }, 
-            title = { x = 570, y = 720 }, 
+            perc       = { x = 1160, y = 608 },
+            title      = { x = 570,  y = 720 },
+            time_left  = { x = 570,  y = 648 },   -- "Battery lasts for X"
+            power_mode = { x = 570,  y = 668 },   -- "Power Mode: X"
         },
     },
 
@@ -71,6 +73,35 @@ local S = {
         list = {x = 10, y = 440},
     },
 
+
+    -- AMD iGPU widget (left, above clock) — clock top edge ~y=160, widget centred at y=85
+    igpu = {
+        x              = 490,
+        y              = 85,
+        radius         = 65,
+        text = {
+            title      = { x = 448, y = 10  },  -- "AMD" label
+            load       = { x = 418, y = 28  },
+            vram       = { x = 418, y = 44  },
+            temp       = { x = 418, y = 60  },
+            name       = { x = 418, y = 162 },  -- below ring
+        }
+    },
+
+    -- NVIDIA eGPU widget (right, above clock)
+    egpu = {
+        x              = 710,
+        y              = 85,
+        radius         = 65,
+        text = {
+            title      = { x = 668, y = 10  },  -- "NVIDIA" label
+            load       = { x = 642, y = 28  },
+            vram       = { x = 642, y = 44  },
+            temp       = { x = 642, y = 60  },
+            pwr        = { x = 642, y = 76  },
+            name       = { x = 642, y = 162 },  -- below ring
+        }
+    },
 
     cpu = {
         x = 200,

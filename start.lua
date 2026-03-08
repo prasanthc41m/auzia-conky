@@ -33,6 +33,8 @@ function start()
     draw_battery()
     draw_titles()
     draw_net()
+    draw_igpu()
+    draw_egpu()
 end
 
 
@@ -93,9 +95,9 @@ end
 
 function draw_disks()
     local rt = fs_used_perc("/")
-    local hm = fs_used_perc("/mnt/Data/")
+    local hm = fs_used_perc("/mnt/Backup/")
     local rt_text = string.format("Root: %s / %s (%s)", fs_used("/"), fs_size("/"), fs_free("/"))
-    local hm_text = string.format("Data: %s / %s (%s)", fs_used("/mnt/Data/"), fs_size("/mnt/Data/"), fs_free("/mnt/Data/"))
+    local hm_text = string.format("Backup: %s / %s (%s)", fs_used("/mnt/Backup/"), fs_size("/mnt/Backup/"), fs_free("/mnt/Backup/"))
 
     ring_anticlockwise(S.disk.x, S.disk.y, S.disk.radius, S.disk.thickness, S.disk.begin_angle, S.disk.end_angle, rt, 100, color_frompercent(tonumber(rt)))
     ring_anticlockwise(S.disk.x, S.disk.y, S.disk.radius-22, S.disk.thickness, S.disk.begin_angle, S.disk.end_angle, hm, 100, color_frompercent(tonumber(hm)))
@@ -124,7 +126,9 @@ function draw_net()
     write(S.net.total.up.x, S.net.total.up.y, "▲"..upload_total(), 12, colors.text)
 
     local inf = {}
-    table.insert(inf, "SSID:        " .. string.sub(ssid(), 0, 15))
+    table.insert(inf, "OS:          " .. parse("exec grep PRETTY_NAME /etc/os-release | cut -d'\"' -f2"))
+    table.insert(inf, "Kernel:      " .. kernel())
+    table.insert(inf, "SSID:       " .. string.sub(ssid(), 0, 15))
     table.insert(inf, "Local IP:    " .. local_ip())
     if use_public_ip then
         if get_public_ip == nil or (updates()%public_ip_refresh_rate) == 0 then
@@ -132,21 +136,185 @@ function draw_net()
         end
     table.insert(inf, "Public IP:   " .. get_public_ip())
     table.insert(inf, "Country:     " .. country())
-    table.insert(inf, "ISP:  " .. isp())               
+    table.insert(inf, "ISP:  " .. isp())
+
+
     end
     write_line_by_line(S.net.list.x, S.net.list.y, 20, inf, colors.text, 12)
 end
 
 
+-- ── GPU Configuration ─────────────────────────────────────────────────────────
+-- Adjust these to match your hardware:
+local IGPU_VRAM_MAX  = 4096   -- iGPU shared VRAM ceiling in MB (e.g. 512–4096)
+local IGPU_TEMP_MAX  = 95     -- iGPU max temp °C
+
+local EGPU_VRAM_MAX  = 8192   -- eGPU dedicated VRAM in MB  (e.g. 4096, 8192)
+local EGPU_POWER_MAX = 200    -- eGPU TDP in Watts
+local EGPU_TEMP_MAX  = 95     -- eGPU max temp °C
+-- ──────────────────────────────────────────────────────────────────────────────
+
+
+-- ── AMD iGPU data (via sysfs + rocm-smi/sensors) ─────────────────────────────
+-- Load: reads from /sys/class/drm (card0 = AMD iGPU on most systems)
+-- VRAM: reads used VRAM from sysfs memory info
+-- Temp: reads via sensors 'edge' label (AMD APU/iGPU standard label)
+
+function igpu_load_percent()
+    -- /sys/class/drm/cardX/device/gpu_busy_percent  — available on amdgpu driver
+    local v = parse("exec cat /sys/class/drm/card0/device/gpu_busy_percent 2>/dev/null || cat /sys/class/drm/card1/device/gpu_busy_percent 2>/dev/null")
+    local n = tonumber(v)
+    if n ~= nil then return tostring(n) end
+    -- fallback: rocm-smi
+    v = parse("exec rocm-smi --showuse 2>/dev/null | awk '/GPU use/{gsub(/[^0-9]/,\"\",$NF); print $NF+0; exit}'")
+    n = tonumber(v)
+    return tostring(n ~= nil and n or 0)
+end
+
+function igpu_temp()
+    -- amdgpu driver exposes temp via hwmon under the device
+    local v = parse("exec cat /sys/class/drm/card0/device/hwmon/hwmon*/temp1_input 2>/dev/null | head -1")
+    local n = tonumber(v)
+    if n ~= nil and n > 1000 then return tostring(math.floor(n / 1000)) end  -- millidegrees → °C
+    if n ~= nil and n > 0    then return tostring(n) end
+    -- fallback: sensors edge label
+    v = parse("exec sensors 2>/dev/null | awk '/^edge/{gsub(/[^0-9.]/,\"\",$2); print int($2+0); exit}'")
+    n = tonumber(v)
+    return tostring(n ~= nil and n or 0)
+end
+
+function igpu_vram_used()
+    -- amdgpu sysfs: mem_info_vram_used in bytes
+    local v = parse("exec cat /sys/class/drm/card0/device/mem_info_vram_used 2>/dev/null || cat /sys/class/drm/card1/device/mem_info_vram_used 2>/dev/null")
+    local n = tonumber(v)
+    if n ~= nil and n > 0 then return tostring(math.floor(n / 1024 / 1024)) end  -- bytes → MB
+    return "0"
+end
+
+function igpu_vram_total()
+    -- amdgpu sysfs: mem_info_vram_total in bytes
+    local v = parse("exec cat /sys/class/drm/card0/device/mem_info_vram_total 2>/dev/null || cat /sys/class/drm/card1/device/mem_info_vram_total 2>/dev/null")
+    local n = tonumber(v)
+    if n ~= nil and n > 0 then return math.floor(n / 1024 / 1024) end  -- bytes → MB
+    return IGPU_VRAM_MAX  -- fallback to configured max
+end
+-- ──────────────────────────────────────────────────────────────────────────────
+
+function igpu_name()
+    local v = parse("exec lspci 2>/dev/null | awk '/VGA|Display/{if(/AMD|ATI/){gsub(/.*\\[/,\"\"); gsub(/\\].*/,\"\"); print; exit}}'")
+    return (v == nil or v == "") and "AMD iGPU" or v
+end
+
+
+function egpu_load()
+    return parse("exec nvidia-smi --query-gpu=utilization.gpu --format=csv,noheader,nounits 2>/dev/null | tr -d ' '")
+end
+
+function egpu_vram_used()
+    return parse("exec nvidia-smi --query-gpu=memory.used --format=csv,noheader,nounits 2>/dev/null | tr -d ' '")
+end
+
+function egpu_temp()
+    return parse("exec nvidia-smi --query-gpu=temperature.gpu --format=csv,noheader,nounits 2>/dev/null | tr -d ' '")
+end
+
+function egpu_power()
+    return parse("exec nvidia-smi --query-gpu=power.draw --format=csv,noheader,nounits 2>/dev/null | awk '{print int($1)}'")
+end
+
+function egpu_name()
+    return parse("exec nvidia-smi --query-gpu=gpu_name --format=csv,noheader,nounits 2>/dev/null")
+end
+
+
+function draw_igpu()
+    local load_str = igpu_load_percent()
+    local temp_str = igpu_temp()
+    local vram_str = igpu_vram_used()
+    local name_str = igpu_name()
+    local vram_max = igpu_vram_total()  -- read actual total from sysfs
+
+    local lv = tonumber(load_str) or 0
+    local tv = tonumber(temp_str) or 0
+    local vv = tonumber(vram_str) or 0
+    if vram_max == 0 then vram_max = IGPU_VRAM_MAX end
+
+    -- Outer ring: AMD iGPU load %
+    ring_clockwise(S.igpu.x, S.igpu.y, S.igpu.radius,    14, 0, 320,
+        lv, 100, color_frompercent(lv))
+    -- Middle ring: VRAM usage (against actual total)
+    ring_clockwise(S.igpu.x, S.igpu.y, S.igpu.radius-18, 11, 0, 320,
+        vv, vram_max, color_frompercent(math.floor(vv / vram_max * 100)))
+    -- Inner ring: Temperature
+    ring_clockwise(S.igpu.x, S.igpu.y, S.igpu.radius-33,  9, 0, 320,
+        tv, IGPU_TEMP_MAX, color_frompercent(math.floor(tv / IGPU_TEMP_MAX * 100)))
+
+    write(S.igpu.text.load.x, S.igpu.text.load.y, "load: " .. lv .. "%",        11, colors.text)
+    write(S.igpu.text.vram.x, S.igpu.text.vram.y, "vram: " .. vv .. " MB",      11, colors.text)
+    write(S.igpu.text.temp.x, S.igpu.text.temp.y, "temp: " .. tv .. "\xc2\xb0C", 11, colors.text)
+    write(S.igpu.text.name.x, S.igpu.text.name.y, string.sub(name_str, 1, 20),  10, colors.text)
+end
+
+
+function draw_egpu()
+    local load_str  = egpu_load()
+    local vram_str  = egpu_vram_used()
+    local temp_str  = egpu_temp()
+    local power_str = egpu_power()
+    local name_str  = egpu_name()
+
+    local lv = tonumber(load_str)  or 0
+    local vv = tonumber(vram_str)  or 0
+    local tv = tonumber(temp_str)  or 0
+    local pv = tonumber(power_str) or 0
+
+    -- Outer ring: eGPU load %
+    ring_clockwise(S.egpu.x, S.egpu.y, S.egpu.radius,    15, 0, 320,
+        lv, 100, color_frompercent(lv))
+    -- Second ring: VRAM usage
+    ring_clockwise(S.egpu.x, S.egpu.y, S.egpu.radius-19, 12, 0, 320,
+        vv, EGPU_VRAM_MAX, color_frompercent(math.floor(vv / EGPU_VRAM_MAX * 100)))
+    -- Third ring: Power draw
+    ring_clockwise(S.egpu.x, S.egpu.y, S.egpu.radius-35, 10, 0, 320,
+        pv, EGPU_POWER_MAX, colors.fg)
+    -- Inner ring: Temperature
+    ring_clockwise(S.egpu.x, S.egpu.y, S.egpu.radius-49,  8, 0, 320,
+        tv, EGPU_TEMP_MAX, color_frompercent(math.floor(tv / EGPU_TEMP_MAX * 100)))
+
+    -- Labels
+    write(S.egpu.text.load.x, S.egpu.text.load.y, "load: " .. lv .. "%",   11, colors.text)
+    write(S.egpu.text.vram.x, S.egpu.text.vram.y, "vram: " .. vv .. " MB",  11, colors.text)
+    write(S.egpu.text.temp.x, S.egpu.text.temp.y, "temp: " .. tv .. "°C",   11, colors.text)
+    write(S.egpu.text.pwr.x,  S.egpu.text.pwr.y,  "pwr:  " .. pv .. " W",   11, colors.text)
+
+    -- GPU model name (trimmed to fit)
+    write(S.egpu.text.name.x, S.egpu.text.name.y, string.sub(name_str, 1, 24), 10, colors.text)
+end
+
+
 function draw_battery()
     if not has_battery then return end
-    if not initialized_battery and tonumber(updates()) > startup_delay + 6  then
+    if not initialized_battery and tonumber(updates()) > startup_delay + 6 then
         init_battery()
     end
-    local bat = battery_percent()
-    ring_anticlockwise(S.battery.x, S.battery.y, S.battery.radius, S.battery.width , S.battery.begin, S.battery.end_, bat, 100, color_frompercent_reverse(tonumber(bat)))
-    write(S.battery.text.perc.x, S.battery.text.perc.y, bat .. "%", 15, colors.text)
-    write(S.battery.text.title.x, S.battery.text.title.y, "Battery", 15, colors.text)
+
+    local bat      = battery_percent()
+    local bat_time = parse("battery_time BAT0")
+    local pwr_mode = parse("execi 5 gdbus call --system --dest net.hadess.PowerProfiles "
+                        .. "--object-path /net/hadess/PowerProfiles "
+                        .. "--method org.freedesktop.DBus.Properties.Get "
+                        .. "\"net.hadess.PowerProfiles\" \"ActiveProfile\" "
+                        .. "| awk -F\"'\" '{print $2}'")
+
+    -- battery arc ring
+    ring_anticlockwise(S.battery.x, S.battery.y, S.battery.radius, S.battery.width,
+        S.battery.begin, S.battery.end_, bat, 100, color_frompercent_reverse(tonumber(bat)))
+
+    -- text labels
+    write(S.battery.text.perc.x,       S.battery.text.perc.y,       bat .. "%",                   15, colors.text)
+    write(S.battery.text.title.x,      S.battery.text.title.y,       "Battery",                    15, colors.text)
+    write(S.battery.text.time_left.x,  S.battery.text.time_left.y,   "Time left:  " .. bat_time,   12, colors.text)
+    write(S.battery.text.power_mode.x, S.battery.text.power_mode.y,  "Power mode: " .. pwr_mode,   12, colors.text)
 end
 
 
@@ -156,6 +324,8 @@ function draw_titles()
     write(325, S.net.y+80, "Internet", 15, colors.text)
     write(S.mem.text.ring_title.x, S.mem.text.ring_title.y, "Memory", 18, colors.text)
     write(S.disk.x+100, S.disk.y-S.disk.radius+130, "Hard Disk", 15, colors.text)
+    write(S.igpu.text.title.x, S.igpu.text.title.y, "AMD",    14, colors.text)
+    write(S.egpu.text.title.x, S.egpu.text.title.y, "NVIDIA", 14, colors.text)
 end
 
 
