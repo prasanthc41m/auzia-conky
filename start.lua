@@ -126,17 +126,19 @@ function draw_net()
     write(S.net.total.up.x, S.net.total.up.y, "▲"..upload_total(), 12, colors.text)
 
     local inf = {}
-    table.insert(inf, "OS:          " .. parse("exec grep PRETTY_NAME /etc/os-release | cut -d'\"' -f2"))
-    table.insert(inf, "Kernel:      " .. kernel())
-    table.insert(inf, "SSID:       " .. string.sub(ssid(), 0, 15))
-    table.insert(inf, "Local IP:    " .. local_ip())
+    table.insert(inf, "OS          :" .. parse("exec grep PRETTY_NAME /etc/os-release | cut -d'\"' -f2"))
+    table.insert(inf, "Kernel      :" .. kernel())
+    table.insert(inf, "SSID        :" .. string.sub(ssid(), 0, 15))
+    table.insert(inf, "WiFi IP     :" .. local_ip())
+    table.insert(inf, "Local IP    :" .. local_ipe())
     if use_public_ip then
         if get_public_ip == nil or (updates()%public_ip_refresh_rate) == 0 then
             update_public_ip()
         end
-    table.insert(inf, "Public IP:   " .. get_public_ip())
-    table.insert(inf, "Country:     " .. country())
-    table.insert(inf, "ISP:  " .. isp())
+
+    table.insert(inf, "Public IP   :" .. get_public_ip())
+    table.insert(inf, "Country     :" .. country())
+    table.insert(inf, "ISP         :" .. isp())
 
 
     end

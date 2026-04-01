@@ -356,8 +356,8 @@ local _upload_total      = "totalup "                 .. net_interface
 local _ssid              = "exec nmcli | grep wlan0 | head -1 | cut -c 20-50 "
 local _country           = "execi 60 wget -q -O - http://ipinfo.io/country "
 local _isp               = "execi 60 wget -q -O - http://ipinfo.io/org | cut -c 10-42 "
-local _local_ip          = "addr "                    .. net_interface
-
+local _local_ip                = "addr "              .. net_interface
+local _local_ipe               = "addr "              .. net_interfaces
 
 -- functions to fetch some important system info
 -- for other variables, see: <http://conky.sourceforge.net/variables.html>
@@ -388,6 +388,7 @@ function ssid()                 return parse(_ssid) end
 function isp()                  return parse(_isp) end              --  value in %
 function country()                  return parse(_country) end
 function local_ip()             return parse(_local_ip) end
+function local_ipe()             return parse(_local_ipe) end
 function uptime()               return parse("uptime") end                  --  ex: 2d 13h 40m
 function uptime_short()         return parse("uptime_short") end            --  ex: 2d 13h
 function time_hrmin()           return parse("time %R") end                 --  ex: 15:40
