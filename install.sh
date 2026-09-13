@@ -2,7 +2,7 @@
 #
 sudo dnf install conky -y
 sudo apt install conky -y
-git clone https://github.com/prasanthc41m/my-auzia-conky.git
+git clone https://github.com/prasanthc41m/auzia-conky.git
 cd auzia-conky
 mkdir $HOME/.config/conky
 mkdir -p ~/.local/share/fonts
