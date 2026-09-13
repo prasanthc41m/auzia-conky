@@ -8,5 +8,5 @@ function conky_getdate()
 end
 
 function conky_gettime()
-    return tostring(os.date("- %H:%M -"))
+    return tostring(os.date("%H:%M:%S"))
 end

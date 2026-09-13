@@ -2,8 +2,10 @@
 #
 sudo dnf install conky -y
 sudo apt install conky -y
+cd /tmp/ && rm -rf auzia-conky && /tmp/conky-start.desktop && /usr/share/applications/conky-start.desktop && /usr/share/applications/conky-start.desktop
 git clone https://github.com/prasanthc41m/auzia-conky.git
 cd auzia-conky
+mv $HOME/.config/conky conky-bak
 mkdir $HOME/.config/conky
 mkdir -p ~/.local/share/fonts
 cp assets/* ~/.local/share/fonts
@@ -21,7 +23,4 @@ ln -s /usr/share/applications/conky-start.desktop  $HOME/.config/autostart/
 #
 mv * $HOME/.config/conky/
 sudo chmod +x $HOME/.config/conky/autostart.sh
-
 #
-gsettings set org.gnome.desktop.background picture-uri file:$HOME/.config/conky/spiderman.jpg
-gsettings set org.gnome.desktop.background picture-uri-dark file:$HOME/.config/conky/spiderman.jpg

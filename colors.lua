@@ -28,11 +28,11 @@ end
 local C = {
     red_dark         = build_color(0xA6A6A6, 0xff0000, dark_text_color),
     red_light        = build_color(0x252525, 0xff0000, light_text_color),
-    blue_dark        = build_color(0xA6A6A6, 0x143CDC, dark_text_color),
+    blue_dark        = build_color(0xA6A6A6, 0x1F51FF, dark_text_color),
     blue_light       = build_color(0x252525, 0x143CDC, light_text_color),
     deepblue_dark    = build_color(0xA6A6A6, 0x0000a8, 0x55ffff, nil, nil, 0.1),
     deepblue_light   = build_color(0x180047, 0x00008B, 0x180047, nil, nil, 0.1),
-    green_dark       = build_color(0xA6A6A6, 0x14DC3C, dark_text_color),
+    green_dark       = build_color(0xA6A6A6, 0x39FF14, dark_text_color),
     green_light      = build_color(0x252525, 0x00ff00, light_text_color),
     emerald_dark     = build_color(0xD3FACD, 0x539950, 0xD3FACD, nil, nil, 0.1),
     emerald_light    = build_color(0x8bff85, 0x3f753d, 0x1a3019, nil, nil, 0.1),

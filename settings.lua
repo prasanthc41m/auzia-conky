@@ -20,7 +20,7 @@ possible values of THEME
     contrast dark     contrast light
 
 ]]
-THEME = "red dark"     -- choose one of the above
+THEME = "green dark"     -- choose one of the above
 
 --[[
 waiting time before starting conky
